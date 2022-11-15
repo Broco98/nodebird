@@ -53,9 +53,11 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {
 });
 
 router.get('/logout', isLoggedIn, (req, res) => {
-    req.logout(); // 세션 쿠키가 사라짐, 서버에서 세션쿠키를 지워버림
-    req.session.destroy(); // 세션을 지움, 파괴
-    res.redirect('/');
+    req.logout(() => {
+        res.redirect('/');
+    }); // 세션 쿠키가 사라짐, 서버에서 세션쿠키를 지워버림
+    // req.session.destroy(); // 세션을 지움, 파괴
+    // res.redirect('/');
 });
 
 // 카카오
@@ -63,7 +65,7 @@ router.get('/kakao', passport.authenticate('kakao'));
 
 router.get('/kakao/callback', passport.authenticate('kakao', {
     failureRedirect: '/',
-    }), (req, res) => {
+    }), (req, res) => { // 로그인 성공시
         res.redirect('/');}
 );
 

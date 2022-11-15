@@ -10,7 +10,10 @@ const passport = require('passport');
 dotenv.config();
 const pageRouter = require('./routes/page');
 const authRouter = require('./routes/auth');
+const postRouter = require('./routes/post');
+const userRouter = require('./routes/user');
 const {sequelize} = require('./models');
+const passportConfig = require('./passport'); // passport 설정
 
 const app = express();
 app.set('port', process.env.PORT || 8001);
@@ -26,9 +29,11 @@ sequelize.sync({force: false}) // sequelize가 db모델 변경된경우 지우�
     .catch((err)=>{
         console.log(err);
     });
+passportConfig(); // passport 실행(연결)
 
 app.use(morgan('dev'));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('img/', express.static(path.join(__dirname, 'uploads'))); // 실제로는 uploads 폴더 안의 이미지를 가져감
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.use(cookieParser(process.env.COOKIE_SECRET));
@@ -41,7 +46,7 @@ app.use(session({
         secure: false,
     },
 })); // 세션을 저장해두니까
- 
+
 // express session 밑에, 라우터 위에 위치해야함
 // 세션을 받아서 처리해야 하므로
 // 로그인 후 팔로우등 작업을할때 필요, 사용.
@@ -50,7 +55,9 @@ app.use(passport.session()); // 세션쿠키를 받아서, id를 알아냄 (해�
 // req.user로 접근 가능
 
 app.use('/', pageRouter);
+app.use('/post', postRouter);
 app.use('/auth', authRouter);
+app.use('/user', userRouter);
 
 app.use((req, res, next) => {
     const error = new Error(`${req.method} ${req.url} 라우터가 없습니다.`);

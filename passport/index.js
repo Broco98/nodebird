@@ -11,8 +11,19 @@ module.exports = () => {
 
     // {id: 3, 'connect.sid' : s%3248952389457239} 이런식으로 저장된다고 함 sid = 세션 쿠키(브라우저로 가는 정보 즉, id변환이라고 생각)
 
-    passport.deserializeUser((id, done) => {
-        User.findOne({ where: {id} })
+    passport.deserializeUser((id, done) => { // 여기서 req.user가 생성된다
+        User.findOne({
+            where: { id },
+            include: [{
+                model: User,
+                attributes: ['id', 'nick'],
+                as: 'Followers', // 둘다 User면 구별이 안되니까, as로 구별
+            },{
+                model: User,
+                attributes: ['id', 'nick'],
+                as: 'Followings',
+            }],
+            })
             .then(user => done(null, user))
             .catch(err => done(err));
     });

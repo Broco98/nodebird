@@ -1,4 +1,4 @@
-// User sequelize 모델 -> db의 테이블
+// User sequelize 모델 -> db의 테이블 즉, 테이블 그 자체라고 생각. 데이터가 담겨있음
 const Sequelize = require('sequelize');
 
 module.exports = class User extends Sequelize.Model{
